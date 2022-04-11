@@ -132,10 +132,23 @@ public class HTTPeXist {
 	}
 
 	/* -->DELETE borrar un reurso */
-	public int delete(String collection, String resourceName) {
+	public int delete(String collection, String resourceName) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + resourceName);
+		System.out.println("-->DELETE-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("DELETE");
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.connect();
+		System.out.println("<--READ-status: " + connect.getResponseCode());
+
+		status = connect.getResponseCode();
+		System.out.println("<--DELETE: " + status + " " +connect.getResponseMessage());
 
 		return status;
 
@@ -144,17 +157,14 @@ public class HTTPeXist {
 	/*-->SUBIR recurso en un String */
 	public int subirString(String collection, String resource, String resourceName) throws IOException {
 		int status = 0;
-
-		System.out.println("-->SUBIRSTRING: " + resourceFileName + " a " + collection);
-		File file = new File(resourceFileName);
-		if (!file.canRead()) {
-			System.err.println("-->SUBIRSTRING: Cannot read file " + file);
-			return -1;
-		}
+		//content = resource;
+		//izenburua = resourceName;
+		System.out.println("-->SUBIRSTRING: " + resourceName + " a " + collection);
+		File file = new File(resourceName);
 		String document = file.getName();
 		URL url = new URL(
 				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + document);
-		System.out.println("-->SUBIR-url: " + url);
+		System.out.println("-->SUBIRSTRING-url: " + url);
 		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
 		connect.setRequestMethod("PUT");
 		connect.setDoOutput(true);
@@ -163,21 +173,13 @@ public class HTTPeXist {
 		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
 		connect.setRequestProperty("ContentType", "aplication/xml");
 
-		StringBuilder postData = new StringBuilder();
-		String cadena = "";
-		FileReader fileReader = new FileReader(file);
-		BufferedReader bufferReader = new BufferedReader(fileReader);
-		while ((cadena = bufferReader.readLine()) != null) {
-			postData.append(cadena + "\n");
-		}
-		byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+		byte[] postDataBytes = resource.toString().getBytes("UTF-8");
 
-		System.out.println("-->SUBIRSTRING: postData : " + postData);
+		System.out.println("-->SUBIRSTRING: postData : " + resource);
 		connect.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
 		connect.setDoOutput(true);
 		connect.getOutputStream().write(postDataBytes);
-		fileReader.close();
-		bufferReader.close();
+
 
 		status = connect.getResponseCode();
 		System.out.println("<--SUBIRSTRING: " + status);
@@ -188,10 +190,23 @@ public class HTTPeXist {
 	}
 
 	/* -->DELETE borrar coleccion */
-	public int delete(String collection) {
+	public int delete(String collection) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		System.out.println("-->DELETE-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("DELETE");
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.connect();
+		System.out.println("<--READ-status: " + connect.getResponseCode());
+
+		status = connect.getResponseCode();
+		System.out.println("<--DELETE: " + status + " " +connect.getResponseMessage());
 
 		return status;
 	}
@@ -245,10 +260,10 @@ public class HTTPeXist {
 		HTTPeXist prueba = new HTTPeXist("http://localhost:8080");
 		String resourceName = "Camion.svg";
 		String collection = "SVG_imagenes";
-		String imagen = prueba.read(collection, resourceName);
-		String lista = prueba.list(collection);
+		//String imagen = prueba.read(collection, resourceName);
+		//String lista = prueba.list(collection);
 		//prueba.subir(collection, "C:\\Users\\jonbl\\Desktop\\zuhaitza.svg");
-
-
+		//prueba.subirString(collection, "probando", "prueba.txt");
+		prueba.delete(collection, "prueba.txt");
 	}
 }
