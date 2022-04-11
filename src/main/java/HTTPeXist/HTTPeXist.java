@@ -54,10 +54,35 @@ public class HTTPeXist {
 	}
 
 	/* -->LIST lista los recursos en una coleccion */
-	public String list(String collection) {
+	public String list(String collection) throws IOException{
 		String lista = new String();
 
-		// FALTA EL CODIGO
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/");
+		System.out.println("-->READ-url:" + url.toString());
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("GET");
+
+		/* Crear codigo de autorizacion y meter en la cabecera Authorization */
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.connect();
+		System.out.println("<--LIST-status: " + connect.getResponseCode());
+
+		/* Lee el contenido del mensaje de respuesta- RECUSRSO */
+		InputStream connectInputStream = connect.getInputStream();
+		InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		String line;
+		while ((line = bufferedReader.readLine()) != null) {
+			lista = lista + line + "\n";
+			System.out.println("<--LIST: " + line);
+		}
+
+
+
+
+
 
 		return lista;
 	}
@@ -120,9 +145,46 @@ public class HTTPeXist {
 	public int subirString(String collection, String resource, String resourceName) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		System.out.println("-->SUBIRSTRING: " + resourceFileName + " a " + collection);
+		File file = new File(resourceFileName);
+		if (!file.canRead()) {
+			System.err.println("-->SUBIRSTRING: Cannot read file " + file);
+			return -1;
+		}
+		String document = file.getName();
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection + "/" + document);
+		System.out.println("-->SUBIR-url: " + url);
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("PUT");
+		connect.setDoOutput(true);
+
+		String codigoBase64 = getAuthorizationCode("admin", "admin");
+		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
+		connect.setRequestProperty("ContentType", "aplication/xml");
+
+		StringBuilder postData = new StringBuilder();
+		String cadena = "";
+		FileReader fileReader = new FileReader(file);
+		BufferedReader bufferReader = new BufferedReader(fileReader);
+		while ((cadena = bufferReader.readLine()) != null) {
+			postData.append(cadena + "\n");
+		}
+		byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+		System.out.println("-->SUBIRSTRING: postData : " + postData);
+		connect.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+		connect.setDoOutput(true);
+		connect.getOutputStream().write(postDataBytes);
+		fileReader.close();
+		bufferReader.close();
+
+		status = connect.getResponseCode();
+		System.out.println("<--SUBIRSTRING: " + status);
+		System.out.println("<--SUBIRSTRING: " + connect.getResponseMessage());
 
 		return status;
+
 	}
 
 	/* -->DELETE borrar coleccion */
@@ -184,6 +246,9 @@ public class HTTPeXist {
 		String resourceName = "Camion.svg";
 		String collection = "SVG_imagenes";
 		String imagen = prueba.read(collection, resourceName);
+		String lista = prueba.list(collection);
+		//prueba.subir(collection, "C:\\Users\\jonbl\\Desktop\\zuhaitza.svg");
+
 
 	}
 }
