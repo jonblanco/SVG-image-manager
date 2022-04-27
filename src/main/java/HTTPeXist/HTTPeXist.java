@@ -157,8 +157,8 @@ public class HTTPeXist {
 	/*-->SUBIR recurso en un String */
 	public int subirString(String collection, String resource, String resourceName) throws IOException {
 		int status = 0;
-		//content = resource;
-		//izenburua = resourceName;
+		//content : resource;
+		//izenburua : resourceName;
 		System.out.println("-->SUBIRSTRING: " + resourceName + " a " + collection);
 		File file = new File(resourceName);
 		String document = file.getName();
@@ -215,8 +215,22 @@ public class HTTPeXist {
 	public int create(String collection) throws IOException {
 		int status = 0;
 
-		// FALTA EL CODIGO
+		URL url = new URL(
+				this.server + "/exist/rest" + XmldbURI.ROOT_COLLECTION_URI + "/" + collection);
+		System.out.println("-->CREATE:" + collection);
+		System.out.println("-->CREATE:" + url +"\n");
 
+		//Fitxategi bat eratu behar da kolekzioa ezabatzeko, ondoren fitxategi hori ezabatuz kolekzio hutsa geldituko da.
+		// Fitxategia gero ezabatzeko:
+		System.out.println("-->CREATE:" + " Building temporal file");
+		status = subirString(collection, "temporal", "temporal");
+
+		//Fitxategi horren ezabaketa
+
+		System.out.println("<--CREATE:" + " Deleting temporal file.");
+		status = delete(collection, "temporal");
+		System.out.println("<--CREATE:" + " Temporal file deleted.");
+		System.out.println("<--CREATE:" + " The collection was correctly created.");
 		return status;
 	}
 
@@ -264,6 +278,7 @@ public class HTTPeXist {
 		//String lista = prueba.list(collection);
 		//prueba.subir(collection, "C:\\Users\\jonbl\\Desktop\\zuhaitza.svg");
 		//prueba.subirString(collection, "probando", "prueba.txt");
-		prueba.delete(collection, "prueba.txt");
+		//prueba.delete(collection, "prueba.txt");
+		prueba.create("Proba");
 	}
 }
