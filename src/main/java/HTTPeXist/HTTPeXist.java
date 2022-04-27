@@ -230,6 +230,11 @@ public class HTTPeXist {
 		System.out.println("<--CREATE:" + " Deleting temporal file.");
 		status = delete(collection, "temporal");
 		System.out.println("<--CREATE:" + " Temporal file deleted.");
+
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.connect();
+		status = connect.getResponseCode();
+		System.out.println("<--CREATE: " + status + " " +connect.getResponseMessage());
 		System.out.println("<--CREATE:" + " The collection was correctly created.");
 		return status;
 	}
@@ -279,6 +284,6 @@ public class HTTPeXist {
 		//prueba.subir(collection, "C:\\Users\\jonbl\\Desktop\\zuhaitza.svg");
 		//prueba.subirString(collection, "probando", "prueba.txt");
 		//prueba.delete(collection, "prueba.txt");
-		prueba.create("Proba");
+		prueba.create("pruebita");
 	}
 }
