@@ -18,7 +18,7 @@ import org.exist.xmldb.XmldbURI;
 import org.xml.sax.SAXException;
 
 public class HTTPeXist {
-
+	// EGILEA: JON BLANCO SUBERBIOLA
 	private String server;
 
 	public HTTPeXist(String server) {
@@ -68,23 +68,33 @@ public class HTTPeXist {
 		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
 		connect.connect();
 		System.out.println("<--LIST-status: " + connect.getResponseCode());
+		int status = connect.getResponseCode();
 
-		/* Lee el contenido del mensaje de respuesta- RECUSRSO */
-		InputStream connectInputStream = connect.getInputStream();
-		InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-		String line;
-		while ((line = bufferedReader.readLine()) != null) {
-			lista = lista + line + "\n";
-			System.out.println("<--LIST: " + line);
+		if(status == 404) {
+
+			return "";
+		} else  {
+
+			/* Lee el contenido del mensaje de respuesta- RECUSRSO */
+			InputStream connectInputStream = connect.getInputStream();
+			InputStreamReader inputStreamReader = new InputStreamReader(connectInputStream);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+			String line;
+			line = bufferedReader.readLine();
+			System.out.println(line);
+			if (line == null){
+				return "hutsa";
+			}else{
+				while (line  != null) {
+					lista = lista + line + "\n";
+					System.out.println("<--LIST: " + line);
+					line=bufferedReader.readLine();
+				}
+			}
+
+
+			return lista;
 		}
-
-
-
-
-
-
-		return lista;
 	}
 
 	/* -->SUBIR recurso en un fichero */
@@ -171,7 +181,7 @@ public class HTTPeXist {
 
 		String codigoBase64 = getAuthorizationCode("admin", "admin");
 		connect.setRequestProperty("Authorization", "Basic " + codigoBase64);
-		connect.setRequestProperty("ContentType", "aplication/xml");
+		connect.setRequestProperty("Content-Type", "aplication/xml");
 
 		byte[] postDataBytes = resource.toString().getBytes("UTF-8");
 

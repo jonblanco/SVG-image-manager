@@ -22,11 +22,14 @@ public class DeleteSvg extends HttpServlet {
         String svgName = request.getParameter("svgName");
 
         //HTTPeXist eXist = new HTTPeXist("http://localHost:8080");
-
-        System.out.println("     Redireccionando a imagenEdit.jsp");
-        RequestDispatcher rd = request.getRequestDispatcher("/jsp/imagenEdit.jsp");
+        eXist.delete(collection, svgName);
+        System.out.println("     Redireccionando a index.jsp");
+        request.setAttribute("informacion",  svgName+" irudia ongi ezabatu da!");
+        RequestDispatcher rd = request.getRequestDispatcher("/jsp/index.jsp");
         rd.forward(request, response);
-        // da null por aquí
+
+
+
     }
 
     @Override

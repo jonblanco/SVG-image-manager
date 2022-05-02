@@ -28,24 +28,37 @@ public class ListResources extends HttpServlet {
 	public void init(ServletConfig config) {
 		System.out.println("---> Entrando en init()de listResource");
 		eXist = new HTTPeXist("http://localHost:8080");
-		System.out.println("---> Saliendo de init()de LoginServlet");
+		System.out.println("---> Saliendo de init()de listResource");
 	}
 	
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("listresources-en SARTZEN");
 
 		String collection = "";
 		collection = request.getParameter("collection");
-		String data=""; data = eXist.list(collection);
+		String data="";
+		data = eXist.list(collection);
+		System.out.println("##########################################################################################################3#");
+
+		System.out.println(data);
+		System.out.println("ARRIBA##########################################################################################################3#");
+
 		Map<String, String> listaSVG;
 		System.out.println("LIST_RESOURCE" + data);
+
 		if (data.equals("")) {
 			System.out.println("----LIST_RESOURCE" + data);
 			request.setAttribute("informacion", "Coleccion No Existe");
 			RequestDispatcher rd = request.getRequestDispatcher("/jsp/index.jsp");
 			rd.forward(request, response);
-		} 
+		}else if (data.equals(("hutsa"))){
+			System.out.println("----LIST_RESOURCE" + data);
+			request.setAttribute("informacion", "Kolekzioa hutsik dago");
+			RequestDispatcher rd = request.getRequestDispatcher("/jsp/index.jsp");
+			rd.forward(request, response);
+		}
 		else {
 			Document doc = convertStringToXMLDocument(data);
 			NodeList valorNode = doc.getElementsByTagName("exist:resource");
